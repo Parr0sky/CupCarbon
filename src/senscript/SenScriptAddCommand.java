@@ -411,7 +411,18 @@ public final class SenScriptAddCommand {
 		if (inst[0].toLowerCase().equals("cprint")) {
 			command = new Command_CPRINT(sensorNode, inst);
 		}
-		
+		if (inst[0].toLowerCase().equals("cifrar")) {
+			command = new Command_CIFRAR(sensorNode, inst[1]);
+		}
+		if (inst[0].toLowerCase().equals("descifrar")) {
+			command = new Command_DEC(sensorNode, inst[1]);
+		}
+		if (inst[0].toLowerCase().equals("llaves")) {
+			command = new Command_KEYS(sensorNode, inst[1], inst[2]);
+		}
+		if(inst[0].toLowerCase().equals("secreto")) {
+			command = new Command_SECRET(sensorNode, inst[1], inst[2]);
+		}
 		//-------
 		// This part must be here (at the end). All new commands must be added before (above)
 		

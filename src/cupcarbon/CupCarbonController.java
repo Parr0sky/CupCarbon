@@ -525,7 +525,7 @@ public class CupCarbonController implements Initializable {
 
 		radioStdComboBox.getItems().removeAll(radioStdComboBox.getItems());
 		radioStdComboBox.getItems().addAll(new RadioStandardModel("802.15.4", "ZIGBEE"),
-				new RadioStandardModel("WiFi", "WIFI"), new RadioStandardModel("LoRa", "LORA"));
+				new RadioStandardModel("WiFi", "WIFI"), new RadioStandardModel("LoRa", "LORA"), new RadioStandardModel("WiFi veh", "11p"));
 		radioStdComboBox.getSelectionModel().select(0);
 
 		probaComboBox.getItems().removeAll(probaComboBox.getItems());

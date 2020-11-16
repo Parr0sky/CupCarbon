@@ -13,11 +13,11 @@ public class RadioModule_Wifi extends RadioModule {
 	}
 
 	public void init() {
-		frequency = 2.4e9;
+		frequency = 5.9e9;
 		radioRangeColor1 = UColor.GREEN_TRANSPARENT;
 		radioRangeColor2 = UColor.GREEND_TRANSPARENT;
-		setRadioRangeRadius(400);
-		setRadioRangeRadiusOri(400);
+		setRadioRangeRadius(100);
+		setRadioRangeRadiusOri(100);
 	}	
 	
 	public int getStandard() {

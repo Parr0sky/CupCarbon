@@ -2,6 +2,7 @@ package crypto;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.security.PrivateKey;
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.Security;
 import java.security.KeyPairGenerator;
@@ -9,10 +10,24 @@ import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.ECGenParameterSpec;
+
+import javax.crypto.Cipher;
 import javax.crypto.KeyAgreement;
+import javax.crypto.SecretKey;
+import javax.xml.bind.DatatypeConverter;
+
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
 import org.bouncycastle.jce.interfaces.ECPrivateKey;
+import org.bouncycastle.crypto.BufferedBlockCipher;
+import org.bouncycastle.crypto.CipherParameters;
+import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.paddings.BlockCipherPadding;
+import org.bouncycastle.crypto.paddings.PKCS7Padding;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
@@ -21,6 +36,21 @@ import org.bouncycastle.math.ec.ECPoint;
 
 public class ECC
 {
+
+	public static byte[] hexStringToByteArray(String s) {
+		byte[] cadena =DatatypeConverter.parseHexBinary(s);
+
+		return cadena;
+	}
+	public static String hexstringToString(String hexString) {
+		try {
+		byte[] bytes = javax.xml.bind.DatatypeConverter.parseHexBinary(hexString);
+		return new String(bytes, "UTF-8");
+		}catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	final protected static char[] hexArray = "0123456789abcdef".toCharArray();
 	public static String bytesToHex(byte[] bytes) {
 		char[] hexChars = new char[bytes.length * 2];
@@ -32,12 +62,15 @@ public class ECC
 		return new String(hexChars);
 	}
 
-	public static byte [] savePublicKey (PublicKey key) throws Exception
+	public static byte [] savePublicKey (PublicKey key) 
 	{
 		//return key.getEncoded();
-
-		ECPublicKey eckey = (ECPublicKey)key;
-		return eckey.getQ().getEncoded(true);
+		try {
+			ECPublicKey eckey = (ECPublicKey)key;
+			return eckey.getQ().getEncoded(true);
+		}catch (Exception e) {
+			return null;
+		}
 	}
 
 	public static PublicKey loadPublicKey (byte [] data) throws Exception
@@ -51,12 +84,15 @@ public class ECC
 		return kf.generatePublic(pubKey);
 	}
 
-	public static byte [] savePrivateKey (PrivateKey key) throws Exception
+	public static byte [] savePrivateKey (PrivateKey key) 
 	{
 		//return key.getEncoded();
-
-		ECPrivateKey eckey = (ECPrivateKey)key;
-		return eckey.getD().toByteArray();
+		try {
+			ECPrivateKey eckey = (ECPrivateKey)key;
+			return eckey.getD().toByteArray();
+		}catch (Exception e) {
+			return null;
+		}
 	}
 
 	public static PrivateKey loadPrivateKey (byte [] data) throws Exception
@@ -70,37 +106,76 @@ public class ECC
 		return kf.generatePrivate(prvkey);
 	}
 
-	public static void doECDH (String name, byte[] dataPrv, byte[] dataPub) throws Exception
+	public static byte[] doECDH (byte[] dataPrv, byte[] dataPub) 
 	{
-		KeyAgreement ka = KeyAgreement.getInstance("ECDH", "BC");
-		ka.init(loadPrivateKey(dataPrv));
-		ka.doPhase(loadPublicKey(dataPub), true);
-		byte [] secret = ka.generateSecret();
-		System.out.println(name + bytesToHex(secret));
+		try {
+			KeyAgreement ka = KeyAgreement.getInstance("ECDH", "BC");
+			ka.init(loadPrivateKey(dataPrv));
+			ka.doPhase(loadPublicKey(dataPub), true);
+			byte [] secret = ka.generateSecret();
+			return secret;
+		}catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public static Key[] generarLlaves() {
+		try {
+			Security.addProvider(new BouncyCastleProvider());
+
+			KeyPairGenerator kpgen = KeyPairGenerator.getInstance("ECDH", "BC");
+			kpgen.initialize(new ECGenParameterSpec("secp256r1"), new SecureRandom());
+			KeyPair pairA = kpgen.generateKeyPair();
+			Key[] llaves= {pairA.getPrivate(),pairA.getPublic()};
+			return llaves;}
+		catch (Exception e) {
+			return null;
+		}
 	}
 
-	public static void main (String [] args) throws Exception
+
+
+	public static byte[] cifrar(SecretKey llave, String texto )
 	{
-		Security.addProvider(new BouncyCastleProvider());
+		byte[] textoCifrado;
+		try
+		{
 
-		KeyPairGenerator kpgen = KeyPairGenerator.getInstance("ECDH", "BC");
-		kpgen.initialize(new ECGenParameterSpec("secp256r1"), new SecureRandom());
-		KeyPair pairA = kpgen.generateKeyPair();
-		KeyPair pairB = kpgen.generateKeyPair();
-		System.out.println("Alice: " + pairA.getPrivate());
-		System.out.println("Alice: " + pairA.getPublic());
-		System.out.println("Bob:   " + pairB.getPrivate());
-		System.out.println("Bob:   " + pairB.getPublic());
-		byte [] dataPrvA = savePrivateKey(pairA.getPrivate());
-		byte [] dataPubA = savePublicKey(pairA.getPublic());
-		byte [] dataPrvB = savePrivateKey(pairB.getPrivate());
-		byte [] dataPubB = savePublicKey(pairB.getPublic());
-		System.out.println("Alice Prv: " + bytesToHex(dataPrvA));
-		System.out.println("Alice Pub: " + bytesToHex(dataPubA));
-		System.out.println("Bob Prv:   " + bytesToHex(dataPrvB));
-		System.out.println("Bob Pub:   " + bytesToHex(dataPubB));
+			Cipher cifrador = Cipher.getInstance("AES/ECB/PKCS5Padding");
+			byte[] textoClaro=texto.getBytes();
+			cifrador.init(1, llave);
+			textoCifrado= cifrador.doFinal(textoClaro);
 
-		doECDH("Alice's secret: ", dataPrvA, dataPubB);
-		doECDH("Bob's secret:   ", dataPrvB, dataPubA);
+			return textoCifrado;
+		}
+		catch(Exception e)
+		{
+			System.out.println(e.getMessage());
+			return null;
+		}
 	}
+	public static byte[] descifrar(SecretKey llave, byte[] texto)
+	{
+		byte[] textoClaro;
+		try
+		{
+
+			Cipher cifrador = Cipher.getInstance("AES/ECB/PKCS5Padding");
+			cifrador.init(Cipher.DECRYPT_MODE, llave);
+			textoClaro= cifrador.doFinal(texto);
+
+		}
+		catch(Exception e)
+		{
+			System.out.println(e.getMessage()) ;
+			return null;
+		}
+		return textoClaro;
+	}
+
 }
+
+
+
+
+
