@@ -21,11 +21,11 @@ public class Command_DEC extends Command {
 	}
 
 	@Override
-	public double execute() {
+	public synchronized double execute() {
 		String x_str = sensor.getScript().getVariableValue(arg2);
-		String[] tab = sensor.getScript().getVector("autos");
-		String val = (String) tab[Double.valueOf(x_str).intValue()];
 		
+		String[] tab = sensor.getScript().getVector("autos");
+		String val = tab[Double.valueOf(x_str).intValue()];
 		
 		byte[] key =ECC.hexStringToByteArray(val);
 		SecretKey llaveSimetricaServ= new SecretKeySpec(key, 0, key.length, "AES");
@@ -36,6 +36,7 @@ public class Command_DEC extends Command {
 		sensor.getScript().addVariable("claro", v);
 		return 0;
 		}catch (Exception e) {
+			System.out.println("Entra al catch");
 			sensor.getScript().addVariable("claro", "ERR");
 			return 0;
 		}

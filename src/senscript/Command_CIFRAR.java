@@ -18,15 +18,17 @@ public class Command_CIFRAR extends Command {
 	}
 
 	@Override
-	public double execute() {
+	public synchronized double execute() {
 		
 		String x_str = sensor.getScript().getVariableValue(arg2);
+		String m = sensor.getScript().getVariableValue(arg1);
 		String[] tab = sensor.getScript().getVector("autos");
+		
 		String val = (String) tab[Double.valueOf(x_str).intValue()];
 		byte[] key =ECC.hexStringToByteArray(val);
 		SecretKey llaveSimetricaServ= new SecretKeySpec(key, 0, key.length, "AES");
 		
-		byte[] textoCifrado=ECC.cifrar(llaveSimetricaServ, arg1);
+		byte[] textoCifrado=ECC.cifrar(llaveSimetricaServ, m);
 		String v = ECC.bytesToHex(textoCifrado) ;
 		sensor.getScript().addVariable("cifrado", v);
 		return 0;

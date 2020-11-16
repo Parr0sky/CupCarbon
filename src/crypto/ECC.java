@@ -163,12 +163,13 @@ public class ECC
 			Cipher cifrador = Cipher.getInstance("AES/ECB/PKCS5Padding");
 			cifrador.init(Cipher.DECRYPT_MODE, llave);
 			textoClaro= cifrador.doFinal(texto);
+			
 
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
-			return null;
+			
+			return "Llave erronea".getBytes();
 		}
 		return textoClaro;
 	}

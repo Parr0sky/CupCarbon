@@ -1,12 +1,13 @@
 List of parameters
 ------------------------------------------
-device_type:4
-device_id:5
-device_longitude:-74.08278465270996
-device_latitude:4.6253404972014955
+device_type:1
+device_id:2
+device_longitude:-74.09363190750122
+device_latitude:4.625896841171948
 device_elevation:0.0
 device_radius:0.0
 device_hide:0
 device_draw_battery:false
 device_sensor_unit_radius:20.0
+device_gps_file_name:route3.gps
 device_script_file_name:auto.csc
