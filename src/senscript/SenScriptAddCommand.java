@@ -412,10 +412,10 @@ public final class SenScriptAddCommand {
 			command = new Command_CPRINT(sensorNode, inst);
 		}
 		if (inst[0].toLowerCase().equals("cifrar")) {
-			command = new Command_CIFRAR(sensorNode, inst[1]);
+			command = new Command_CIFRAR(sensorNode, inst[1], inst[2]);
 		}
 		if (inst[0].toLowerCase().equals("descifrar")) {
-			command = new Command_DEC(sensorNode, inst[1]);
+			command = new Command_DEC(sensorNode, inst[1], inst[2]);
 		}
 		if (inst[0].toLowerCase().equals("llaves")) {
 			command = new Command_KEYS(sensorNode, inst[1], inst[2]);
