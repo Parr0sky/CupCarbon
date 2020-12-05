@@ -28,7 +28,7 @@ public class Command_SECRET extends Command {
 		if (uno !=null) {
 			String eteSech=sensor.getScript().getVariableValue("$priv");
 			byte[] secreto = ECC.doECDH( ECC.hexStringToByteArray(eteSech), uno);
-
+			System.out.println("Tamaño simetrica: "+secreto.length);
 			String v = ECC.bytesToHex(secreto) ;
 			sensor.getScript().addVariable("sec", v);
 			return 0;

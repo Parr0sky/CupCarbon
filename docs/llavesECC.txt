@@ -1,0 +1,2 @@
+Llave pública ECC: 91bytes
+Llave privada ECC: 150bytes

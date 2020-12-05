@@ -1,4 +1,7 @@
 package crypto;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.security.PrivateKey;
@@ -44,8 +47,8 @@ public class ECC
 	}
 	public static String hexstringToString(String hexString) {
 		try {
-		byte[] bytes = javax.xml.bind.DatatypeConverter.parseHexBinary(hexString);
-		return new String(bytes, "UTF-8");
+			byte[] bytes = javax.xml.bind.DatatypeConverter.parseHexBinary(hexString);
+			return new String(bytes, "UTF-8");
 		}catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -120,14 +123,27 @@ public class ECC
 		}
 	}
 	public static Key[] generarLlaves() {
+
 		try {
+
 			Security.addProvider(new BouncyCastleProvider());
 
 			KeyPairGenerator kpgen = KeyPairGenerator.getInstance("ECDH", "BC");
 			kpgen.initialize(new ECGenParameterSpec("secp256r1"), new SecureRandom());
 			KeyPair pairA = kpgen.generateKeyPair();
 			Key[] llaves= {pairA.getPrivate(),pairA.getPublic()};
-			return llaves;}
+			
+			File myObj = new File("docs/llavesECC.txt");
+			if (myObj.createNewFile()) {
+				FileWriter myWriter = new FileWriter("docs/llavesECC.txt");
+			      myWriter.write("Llave pública ECC: "+pairA.getPublic().getEncoded().length+"bytes");
+			      myWriter.write("Llave privada ECC: "+pairA.getPrivate().getEncoded().length+"bytes");
+			      myWriter.close();
+			} else {
+				
+			}
+			return llaves;
+		}
 		catch (Exception e) {
 			return null;
 		}
@@ -137,6 +153,7 @@ public class ECC
 
 	public static byte[] cifrar(SecretKey llave, String texto )
 	{
+
 		byte[] textoCifrado;
 		try
 		{
@@ -163,12 +180,12 @@ public class ECC
 			Cipher cifrador = Cipher.getInstance("AES/ECB/PKCS5Padding");
 			cifrador.init(Cipher.DECRYPT_MODE, llave);
 			textoClaro= cifrador.doFinal(texto);
-			
+
 
 		}
 		catch(Exception e)
 		{
-			
+
 			return "Llave erronea".getBytes();
 		}
 		return textoClaro;
